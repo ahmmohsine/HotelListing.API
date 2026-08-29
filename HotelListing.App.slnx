@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".git/instructions/agents.md" />
+  </Folder>
+  <Project Path="HotelListing.API/HotelListing.API.csproj" />
+</Solution>
