@@ -40,6 +40,7 @@ namespace HotelListing.API.Controllers
             {
                 _repository.Add(newCountry);
                 return CreatedAtRoute("GetCountryById", new { id = newCountry.Id }, newCountry);
+
             }
             catch (InvalidOperationException ex)
             {

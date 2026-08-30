@@ -31,7 +31,9 @@ namespace HotelListing.API.Data
                 .RuleFor(h => h.Id, f => hotelId++)
                 .RuleFor(h => h.Name, f => $"{f.Company.CompanyName()} Hotel")
                 .RuleFor(h => h.Address, f => f.Address.FullAddress())
-                .RuleFor(h => h.Rating, f => Math.Round(f.Random.Double(1, 5), 1));
+                .RuleFor(h => h.Rating, f => Math.Round(f.Random.Double(1, 5), 1))
+                .RuleFor(h => h.CountryId, f => f.Random.Int(1, 3))
+                ;
 
             return hotelFaker.Generate(count);
         }

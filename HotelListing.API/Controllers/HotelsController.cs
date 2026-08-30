@@ -29,6 +29,7 @@ namespace HotelListing.API.Controllers
 
         // POST api/<HotelsController>
         [HttpPost]
+        [HttpGet("{id:int}", Name = "GetHotelById")]
         public ActionResult<Hotel> Post([FromBody] Hotel newHotel)
         {
             if (hotels.Any(hotel => hotel.Id == newHotel.Id))
@@ -51,6 +52,7 @@ namespace HotelListing.API.Controllers
             existingHotel.Address = updatedHotel.Address;
             existingHotel.Name = updatedHotel.Name;
             existingHotel.Rating = updatedHotel.Rating;
+            existingHotel.CountryId = updatedHotel.CountryId;
             return NoContent();
         }
 

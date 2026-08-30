@@ -4,14 +4,17 @@ GET {{HotelListing.API_HostAddress}}/api/hotels
 Accept: application/json
 
 ###
-POST {{HotelListing.API_HostAddress}}/api/hotels
+###
+PUT {{HotelListing.API_HostAddress}}/api/hotels/3
 Content-Type: application/json
 
 {
-  //Hotel
+	"id": 113,
+	"name": "Grand Hotel Brussels Updated",
+	"address": "Rue Royale 100, 1000 Bruxelles",
+	"rating": 4.8,
+	"countryId": 1
 }
-
-###
 
 @id=1
 DELETE {{HotelListing.API_HostAddress}}/api/hotels/{{id}}
@@ -31,5 +34,23 @@ Content-Type: application/json
 ###
 @id=1
 GET {{HotelListing.API_HostAddress}}/api/hotels/{{id}}
+
+###
+
+GET {{HotelListing.API_HostAddress}}/api/countries
+
+###
+
+### Test de création d'hôtel
+POST {{HotelListing.API_HostAddress}}/api/hotels
+Content-Type: application/json
+
+{
+	"id": 16,
+	"name": "Grand Hotel Brussels",
+	"address": "Rue Royale 100, 1000 Bruxelles",
+	"rating": 4.5,
+	"countryId": 1
+}
 
 ###
