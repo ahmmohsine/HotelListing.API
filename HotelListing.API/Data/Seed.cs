@@ -37,5 +37,14 @@ namespace HotelListing.API.Data
 
             return hotelFaker.Generate(count);
         }
+        public static List<Country> GenerateCountries(int count = 10)
+        {
+            var countryFaker = new Faker<Country>("fr")
+             .RuleFor(c => c.Id, f => f.IndexGlobal)
+             .RuleFor(c => c.Name, f => f.Address.Country())
+             .RuleFor(c => c.Code, f => f.Address.CountryCode());
+
+            return countryFaker.Generate(count);
+        }
     }
 }

@@ -2,7 +2,7 @@ using HotelListing.API.Data;
 
 namespace HotelListing.API.Repositories
 {
-    public class CountryRepository : ICountryRepository
+    public class CountryRepository : IGenericRepository<Country>
     {
         private static readonly List<Country> _countries = new List<Country>
         {
@@ -13,51 +13,56 @@ namespace HotelListing.API.Repositories
             new Country { Id = 5, Name = "France", Code = "FR" }
         };
 
-        public IEnumerable<Country> GetAll()
+        public Task<IEnumerable<Country>> GetAllAsync(CancellationToken ct = default)
         {
-            return _countries;
+            return Task.FromResult<IEnumerable<Country>>(_countries);
         }
 
-        public Country? GetById(int id)
+        public Task<Country?> GetByIdAsync(int id, CancellationToken ct = default)
         {
-            return _countries.FirstOrDefault(c => c.Id == id);
+            return Task.FromResult(_countries.FirstOrDefault(c => c.Id == id));
+
         }
 
-        public void Add(Country country)
+        public Task UpdateAsync(Country country, CancellationToken ct = default)
         {
-            if (Exists(country.Id))
+            var _country = _countries.FirstOrDefault(c => c.Id == country.Id);
+            if (_country == null)
+            {
+                throw new KeyNotFoundException($"Le pays avec l'ID {country.Id} n'existe pas.");
+            }
+            _country.Name = country.Name;
+            _country.Code = country.Code;
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteAsync(int id, CancellationToken ct = default)
+        {
+            var _country = _countries.FirstOrDefault(c => c.Id == id);
+            if (_country == null)
+            {
+                throw new KeyNotFoundException($"Country with Id {id} not found");
+            }
+
+            _countries.Remove(_country);
+            return Task.CompletedTask;
+        }
+
+        public Task<bool> ExistsAsync(int id, CancellationToken ct = default)
+        {
+            return Task.FromResult(_countries.Any(h => h.Id == id));
+        }
+
+
+        public Task<Country> AddAsync(Country country, CancellationToken ct = default)
+        {
+
+            if (_countries.Any(c => c.Id == country.Id))
             {
                 throw new InvalidOperationException($"Country with Id {country.Id} already exists");
             }
             _countries.Add(country);
-        }
-
-        public void Update(int id, Country country)
-        {
-            var existingCountry = GetById(id);
-            if (existingCountry == null)
-            {
-                throw new KeyNotFoundException($"Country with Id {id} not found");
-            }
-
-            existingCountry.Name = country.Name;
-            existingCountry.Code = country.Code;
-        }
-
-        public void Delete(int id)
-        {
-            var country = GetById(id);
-            if (country == null)
-            {
-                throw new KeyNotFoundException($"Country with Id {id} not found");
-            }
-
-            _countries.Remove(country);
-        }
-
-        public bool Exists(int id)
-        {
-            return _countries.Any(c => c.Id == id);
+            return Task.FromResult(country);
         }
     }
 }

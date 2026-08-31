@@ -1,26 +1,16 @@
-using HotelListing.API.Repositories;
+using HotelListing.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddScoped<ICountryRepository, CountryRepository>();
-
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Add services to the container using grouped extension method
+builder.Services.AddApiServices();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
+// Configure the HTTP request pipeline using grouped extension method
+app.UseApiConfiguration();
 
 app.Run();
+
+// Partial Program class to support WebApplicationFactory<Program> integration testing
+public partial class Program { }

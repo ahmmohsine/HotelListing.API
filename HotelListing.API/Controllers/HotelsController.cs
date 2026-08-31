@@ -1,4 +1,5 @@
-﻿using HotelListing.API.Data;
+﻿using HotelListing.API.DTOs;
+using HotelListing.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -9,64 +10,79 @@ namespace HotelListing.API.Controllers
     [ApiController]
     public class HotelsController : ControllerBase
     {
-        private static readonly List<Hotel> hotels = Seed.GenerateHotels();
-        // private static readonly List<Hotel> hotels = new List<Hotel>() { new Hotel() { Id = 1, Name = "test", Address = "Adresse", Rating = 4.5 } };
-        [HttpGet]
-        public ActionResult<IEnumerable<Hotel>> Get()
+        private readonly IHotelService _hotelService;
+
+
+        public HotelsController(IHotelService hotelService)
         {
+            _hotelService = hotelService ?? throw new ArgumentNullException(nameof(hotelService));
+        }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<HotelReadOnlyDto>))]
+        public async Task<IActionResult> GetAll(CancellationToken ct)
+        {
+            var hotels = await _hotelService.GetAllAsync(ct);
             return Ok(hotels);
         }
 
-        // GET api/<HotelsController>/5
-        [HttpGet("{id}")]
-        public ActionResult<Hotel> Get(int id)
+        [HttpGet("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(HotelReadOnlyDto))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetById([FromRoute] int id, CancellationToken ct)
         {
-            var h = hotels.FirstOrDefault(h => h.Id == id);
-            if (h == null)
-                return NotFound();
-            return Ok(h);
-        }
+            var hotel = await _hotelService.GetByIdAsync(id, ct);
 
-        // POST api/<HotelsController>
+            if (hotel is null)
+            {
+                return NotFound(new { Message = $"L'hôtel avec l'ID {id} n'a pas été trouvé." });
+            }
+
+            return Ok(hotel);
+        }
         [HttpPost]
-        [HttpGet("{id:int}", Name = "GetHotelById")]
-        public ActionResult<Hotel> Post([FromBody] Hotel newHotel)
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(HotelReadOnlyDto))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Create([FromBody] CreateHotelDto dto, CancellationToken ct)
         {
-            if (hotels.Any(hotel => hotel.Id == newHotel.Id))
-            {
-                return BadRequest("Hotelwith this Id already exists");
-            }
-            hotels.Add(newHotel);
-            return CreatedAtRoute("GetHotelById", new { id = newHotel.Id }, newHotel);
+            var createdHotel = await _hotelService.CreateAsync(dto, ct);
+
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = createdHotel.Id },
+                createdHotel
+            );
         }
 
-        // PUT api/<HotelsController>/5
-        [HttpPut("{id}")]
-        public ActionResult Put(int id, [FromBody] Hotel updatedHotel)
+        [HttpPut("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateHotelDto dto, CancellationToken ct)
         {
-            var existingHotel = hotels.FirstOrDefault(hotel => hotel.Id == id);
-            if (existingHotel == null)
+            var updated = await _hotelService.UpdateAsync(id, dto, ct);
+
+            if (!updated)
             {
-                return NotFound();
+                return NotFound(new { Message = $"Impossible de mettre à jour. L'hôtel avec l'ID {id} n'existe pas." });
             }
-            existingHotel.Address = updatedHotel.Address;
-            existingHotel.Name = updatedHotel.Name;
-            existingHotel.Rating = updatedHotel.Rating;
-            existingHotel.CountryId = updatedHotel.CountryId;
+
+            return NoContent();
+        }
+        [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken ct)
+        {
+            var deleted = await _hotelService.DeleteAsync(id, ct);
+
+            if (!deleted)
+            {
+                return NotFound(new { Message = $"Impossible de supprimer. L'hôtel avec l'ID {id} n'existe pas." });
+            }
+
             return NoContent();
         }
 
-        // DELETE api/<HotelsController>/5
-        [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
-        {
-            var existingHotel = hotels.FirstOrDefault(hotel => hotel.Id == id);
-            if (existingHotel == null)
-            {
-                return NotFound(new { message = "Hotel not found!" });
-            }
-            hotels.Remove(existingHotel);
-            return NoContent();
-        }
     }
 }
