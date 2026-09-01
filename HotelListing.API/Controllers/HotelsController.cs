@@ -56,15 +56,19 @@ namespace HotelListing.API.Controllers
 
         [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateHotelDto dto, CancellationToken ct)
         {
             var updated = await _hotelService.UpdateAsync(id, dto, ct);
 
             if (!updated)
             {
-                return NotFound(new { Message = $"Impossible de mettre à jour. L'hôtel avec l'ID {id} n'existe pas." });
+                return Problem(
+                    statusCode: StatusCodes.Status404NotFound,
+                    title: "Ressource introuvable",
+                    detail: $"Impossible de mettre à jour. L'hôtel avec l'ID {id} n'existe pas."
+                );
             }
 
             return NoContent();

@@ -9,14 +9,13 @@ PUT {{HotelListing.API_HostAddress}}/api/hotels/3
 Content-Type: application/json
 
 {
-	"id": 113,
-	"name": "Grand Hotel Brussels Updated",
-	"address": "Rue Royale 100, 1000 Bruxelles",
-	"rating": 4.8,
-	"countryId": 1
+  "name": "Grand Hotel Brussels Updated",
+  "address": "Rue Royale 100, 1000 Bruxelles",
+  "rating": 4,
+  "countryId": 1
 }
-
-@id=1
+###
+@id=0
 DELETE {{HotelListing.API_HostAddress}}/api/hotels/{{id}}
 
 ###
@@ -28,29 +27,37 @@ POST {{HotelListing.API_HostAddress}}/api/hotels
 Content-Type: application/json
 
 {
-  //Hotel
+	"name": "Grand Hotel Brussels Updated",
+	"address": "Rue Royale 100, 1000 Bruxelles",
+	"rating": 4.8,
+	"countryId": 1
 }
-
 ###
-@id=1
-GET {{HotelListing.API_HostAddress}}/api/hotels/{{id}}
-
-###
-
 GET {{HotelListing.API_HostAddress}}/api/countries
 
 ###
+GET {{HotelListing.API_HostAddress}}/api/countries/1
 
-### Test de création d'hôtel
-POST {{HotelListing.API_HostAddress}}/api/hotels
+###
+GET {{HotelListing.API_HostAddress}}/api/countries/999
+
+### 
+POST {{HotelListing.API_HostAddress}}/api/countries
 Content-Type: application/json
 
 {
-	"id": 16,
-	"name": "Grand Hotel Brussels",
-	"address": "Rue Royale 100, 1000 Bruxelles",
-	"rating": 4.5,
-	"countryId": 1
+  "name": "Belgique",
+  "code": "BE"
 }
 
 ###
+PUT {{HotelListing.API_HostAddress}}/api/countries/1
+Content-Type: application/json
+
+{
+  "name": "United States of America",
+  "code": "US"
+}
+
+###
+DELETE {{HotelListing.API_HostAddress}}/api/countries/5

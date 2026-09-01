@@ -12,10 +12,11 @@ namespace HotelListing.API.DTOs
         [StringLength(250, ErrorMessage = "L'adresse ne peut pas dépasser 250 caractères.")]
         public string Address { get; set; } = string.Empty;
 
-        [Range(1, 5, ErrorMessage = "La note doit être comprise entre 1 et 5.")]
+        [Range(1.0, 5.0, ErrorMessage = "La note doit être comprise entre 1.0 et 5.0.")]
         public double Rating { get; set; }
 
         [Required(ErrorMessage = "L'identifiant du pays est obligatoire.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Veuillez fournir un ID de pays valide.")]
         public int CountryId { get; set; }
     }
 }

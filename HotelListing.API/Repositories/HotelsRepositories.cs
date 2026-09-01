@@ -1,4 +1,5 @@
 ﻿using HotelListing.API.Data;
+using System.Linq.Expressions;
 
 namespace HotelListing.API.Repositories;
 
@@ -17,13 +18,14 @@ public class HotelsRepository : IGenericRepository<Hotel>
         return Task.FromResult(hotel);
     }
 
-    public Task<Hotel> AddAsync(Hotel entity, CancellationToken ct = default)
+    public Task<Hotel> AddAsync(Hotel hotel, CancellationToken ct = default)
     {
-        entity.Id = GetMaxId();
-        _hotels.Add(entity);
-        return Task.FromResult(entity);
-    }
+        int nextId = _hotels.Any() ? _hotels.Max(h => h.Id) + 1 : 1;
+        hotel.Id = nextId;
 
+        _hotels.Add(hotel);
+        return Task.FromResult(hotel);
+    }
     public Task UpdateAsync(Hotel entity, CancellationToken ct = default)
     {
         var existingHotel = _hotels.FirstOrDefault(h => h.Id == entity.Id);
@@ -55,8 +57,11 @@ public class HotelsRepository : IGenericRepository<Hotel>
     {
         return Task.FromResult(_hotels.Any(h => h.Id == id));
     }
-    public int GetMaxId()
+
+
+    public Task<Hotel?> FindAsync(Expression<Func<Hotel, bool>> predicate, CancellationToken ct = default)
     {
-        return _hotels.Any() ? _hotels.Max(h => h.Id) + 1 : 1;
+        var hotel = _hotels.AsQueryable().FirstOrDefault(predicate);
+        return Task.FromResult(hotel);
     }
 }
