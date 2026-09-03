@@ -2,84 +2,91 @@
 using HotelListing.API.DTOs;
 using HotelListing.API.Repositories;
 
-namespace HotelListing.API.Services
+namespace HotelListing.API.Services;
+
+public class HotelService : IHotelService
 {
-    public class HotelService : IHotelService
+    private readonly IGenericRepository<Hotel> _hotelRepository;
+
+    public HotelService(IGenericRepository<Hotel> hotelRepository)
     {
-        private readonly IGenericRepository<Hotel> _hotelRepository;
-        public HotelService(IGenericRepository<Hotel> hotelRepository)
-        {
-            _hotelRepository = hotelRepository ?? throw new ArgumentNullException(nameof(hotelRepository));
-        }
-        public async Task<HotelReadOnlyDto> CreateAsync(CreateHotelDto hotalDto, CancellationToken ct = default)
-        {
-            var hotel = new Hotel()
-            {
-                Name = hotalDto.Name,
-                Address = hotalDto.Address,
-                Rating = hotalDto.Rating,
-                CountryId = hotalDto.CountryId,
-            };
-            var createdHotel = await _hotelRepository.AddAsync(hotel, ct);
-            return MapToReadOnlyDto(createdHotel);
-        }
+        _hotelRepository = hotelRepository ?? throw new ArgumentNullException(nameof(hotelRepository));
+    }
 
-        private HotelReadOnlyDto MapToReadOnlyDto(Hotel hotel)
+    public async Task<HotelReadOnlyDto> CreateAsync(CreateHotelDto hotelDto, CancellationToken ct = default)
+    {
+        var hotel = new Hotel
         {
-            return new HotelReadOnlyDto
-            {
-                Id = hotel.Id,
-                Name = hotel.Name,
-                Address = hotel.Address,
-                Rating = hotel.Rating,
-                CountryId = hotel.CountryId
-            };
-        }
+            Name = hotelDto.Name,
+            Address = hotelDto.Address,
+            Rating = hotelDto.Rating,
+            CountryId = hotelDto.CountryId,
+        };
 
-        public async Task<bool> DeleteAsync(int id, CancellationToken ct = default)
+        var createdHotel = await _hotelRepository.AddAsync(hotel, ct);
+        return MapToReadOnlyDto(createdHotel);
+    }
+
+    public async Task<IEnumerable<HotelReadOnlyDto>> GetAllAsync(CancellationToken ct = default)
+    {
+        var list = await _hotelRepository.GetAllAsync(ct);
+        return list.Select(MapToReadOnlyDto);
+    }
+
+    public async Task<HotelReadOnlyDto?> GetByIdAsync(int id, CancellationToken ct = default)
+    {
+        var hotel = await _hotelRepository.GetByIdAsync(id, ct);
+        return hotel is null ? null : MapToReadOnlyDto(hotel);
+    }
+
+    public async Task UpdateAsync(int id, UpdateHotelDto dto, CancellationToken ct = default)
+    {
+        if (!await _hotelRepository.ExistsAsync(id, ct))
         {
-            var exists = await _hotelRepository.ExistsAsync(id, ct);
-            if (!exists) return false;
-
-            await _hotelRepository.DeleteAsync(id, ct);
-            return true;
+            throw new KeyNotFoundException($"Impossible de mettre à jour : l'hôtel avec l'ID {id} n'existe pas.");
         }
 
-        public async Task<IEnumerable<HotelReadOnlyDto>> GetAllAsync(CancellationToken ct = default)
-        {
-            var list = await _hotelRepository.GetAllAsync(ct);
-            return list.Select(MapToReadOnlyDto);
-        }
+        await _hotelRepository.UpdateAsync(MapToHotel(id, dto), ct);
+    }
 
-        public async Task<HotelReadOnlyDto?> GetByIdAsync(int id, CancellationToken ct = default)
+    public async Task DeleteAsync(int id, CancellationToken ct = default)
+    {
+        bool isDeleted = await _hotelRepository.DeleteAsync(id, ct);
+        if (!isDeleted)
         {
-            var hotel = await _hotelRepository.GetByIdAsync(id, ct);
-            return hotel is null ? null : MapToReadOnlyDto(hotel);
-        }
-
-        public async Task<bool> UpdateAsync(int id, UpdateHotelDto dto, CancellationToken ct = default)
-        {
-            if (!await _hotelRepository.ExistsAsync(id))
-                return false;
-            await _hotelRepository.UpdateAsync(MapToHotel(id, dto), ct);
-            return true;
-        }
-
-        private Hotel MapToHotel(int id, UpdateHotelDto dto)
-        {
-            return new Hotel()
-            {
-                Id = id,
-                Name = dto.Name,
-                Address = dto.Address,
-                Rating = dto.Rating,
-                CountryId = dto.CountryId,
-            };
-        }
-
-        public async Task<bool> ExistsAsync(int id, CancellationToken ct = default)
-        {
-            return await _hotelRepository.ExistsAsync(id, ct);
+            throw new KeyNotFoundException($"Impossible de supprimer : l'hôtel avec l'ID {id} n'existe pas.");
         }
     }
+
+    public async Task<bool> ExistsAsync(int id, CancellationToken ct = default)
+    {
+        return await _hotelRepository.ExistsAsync(id, ct);
+    }
+
+    // --- Private Mappers ---
+    private static HotelReadOnlyDto MapToReadOnlyDto(Hotel hotel)
+    {
+        return new HotelReadOnlyDto
+        {
+            Id = hotel.Id,
+            Name = hotel.Name,
+            Address = hotel.Address,
+            Rating = hotel.Rating,
+            CountryId = hotel.CountryId
+        };
+    }
+
+    private static Hotel MapToHotel(int id, UpdateHotelDto dto)
+    {
+        return new Hotel
+        {
+            Id = id,
+            Name = dto.Name,
+            Address = dto.Address,
+            Rating = dto.Rating,
+            CountryId = dto.CountryId,
+        };
+    }
+
+
 }

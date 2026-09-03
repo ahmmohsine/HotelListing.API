@@ -1,29 +1,39 @@
 ﻿using Bogus;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotelListing.API.Data
 {
     public class Seed
     {
-        /* public static async Task SeedHotelsAsync(AppDbContext context, CancellationToken cancellationToken = default)
-         {
-             // 1. Vérification d'existence préalable (éviter les doublons)
-             if (await context.Hotels.AnyAsync(cancellationToken)) return;
+        public static async Task SeedHotelsAsync(HotelListingDbContext context, CancellationToken cancellationToken = default)
+        {
+            if (await context.Hotels.AnyAsync(cancellationToken)) return;
 
-             // 2. Configuration du Generator Bogus pour la classe Hotel
-             var hotelFaker = new Faker<Hotel>()
-                 .RuleFor(h => h.Name, f => f.Company.CompanyName() + " Hotel")
-                 .RuleFor(h => h.Address, f => f.Address.FullAddress())
-                 .RuleFor(h => h.Rating, f => Math.Round(f.Random.Double(1, 5), 1))
-                 .RuleFor(h => h.CountryId, f => f.Random.Number(1, 5)); // Ajuster selon tes IDs de pays existants
+            var hotelFaker = new Faker<Hotel>()
+                .RuleFor(h => h.Name, f => f.Company.CompanyName() + " Hotel")
+                .RuleFor(h => h.Address, f => f.Address.FullAddress())
+                .RuleFor(h => h.Rating, f => Math.Round(f.Random.Double(1, 5), 1))
+                .RuleFor(h => h.CountryId, f => f.Random.Number(1, 5));
+            var hotels = hotelFaker.Generate(10);
 
-             // 3. Génération synchrone en mémoire
-             var hotels = hotelFaker.Generate(10);
+            await context.Hotels.AddRangeAsync(hotels, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+        }
+        public static async Task GenerateCountries(HotelListingDbContext context, CancellationToken cancellationToken = default)
+        {
+            if (await context.Countries.AnyAsync(cancellationToken)) return;
 
-             // 4. Insertion asynchrone groupée
-             await context.Hotels.AddRangeAsync(hotels, cancellationToken);
-             await context.SaveChangesAsync(cancellationToken);
-         }*/
-        public static List<Hotel> GenerateHotels(int count = 10)
+            var countryFaker = new Faker<Country>("fr")
+           .RuleFor(c => c.Id, f => f.IndexGlobal)
+           .RuleFor(c => c.Name, f => f.Address.Country())
+           .RuleFor(c => c.Code, f => f.Address.CountryCode());
+
+            var countries = countryFaker.Generate(10);
+
+            await context.Countries.AddRangeAsync(countries, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+        }
+        public static List<Hotel> GenerateHotels_(int count = 10)
         {
             var hotelId = 1;
 

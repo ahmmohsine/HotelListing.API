@@ -2,91 +2,74 @@
 using HotelListing.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+namespace HotelListing.API.Controllers;
 
-namespace HotelListing.API.Controllers
+[Route("api/[controller]")]
+[ApiController]
+public class HotelsController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class HotelsController : ControllerBase
+    private readonly IHotelService _hotelService;
+
+    public HotelsController(IHotelService hotelService)
     {
-        private readonly IHotelService _hotelService;
+        _hotelService = hotelService ?? throw new ArgumentNullException(nameof(hotelService));
+    }
 
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<HotelReadOnlyDto>))]
+    public async Task<IActionResult> GetAll(CancellationToken ct)
+    {
+        var hotels = await _hotelService.GetAllAsync(ct);
+        return Ok(hotels);
+    }
 
-        public HotelsController(IHotelService hotelService)
+    [HttpGet("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(HotelReadOnlyDto))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetById([FromRoute] int id, CancellationToken ct)
+    {
+        var hotel = await _hotelService.GetByIdAsync(id, ct);
+
+        if (hotel is null)
         {
-            _hotelService = hotelService ?? throw new ArgumentNullException(nameof(hotelService));
+            return NotFound(new { Message = $"L'hôtel avec l'ID {id} n'a pas été trouvé." });
         }
 
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<HotelReadOnlyDto>))]
-        public async Task<IActionResult> GetAll(CancellationToken ct)
-        {
-            var hotels = await _hotelService.GetAllAsync(ct);
-            return Ok(hotels);
-        }
+        return Ok(hotel);
+    }
 
-        [HttpGet("{id:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(HotelReadOnlyDto))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetById([FromRoute] int id, CancellationToken ct)
-        {
-            var hotel = await _hotelService.GetByIdAsync(id, ct);
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(HotelReadOnlyDto))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Create([FromBody] CreateHotelDto dto, CancellationToken ct)
+    {
+        var createdHotel = await _hotelService.CreateAsync(dto, ct);
 
-            if (hotel is null)
-            {
-                return NotFound(new { Message = $"L'hôtel avec l'ID {id} n'a pas été trouvé." });
-            }
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = createdHotel.Id },
+            createdHotel
+        );
+    }
 
-            return Ok(hotel);
-        }
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(HotelReadOnlyDto))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Create([FromBody] CreateHotelDto dto, CancellationToken ct)
-        {
-            var createdHotel = await _hotelService.CreateAsync(dto, ct);
+    [HttpPut("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateHotelDto dto, CancellationToken ct)
+    {
+        await _hotelService.UpdateAsync(id, dto, ct);
 
-            return CreatedAtAction(
-                nameof(GetById),
-                new { id = createdHotel.Id },
-                createdHotel
-            );
-        }
+        return NoContent();
+    }
 
-        [HttpPut("{id:int}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateHotelDto dto, CancellationToken ct)
-        {
-            var updated = await _hotelService.UpdateAsync(id, dto, ct);
+    [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken ct)
+    {
+        await _hotelService.DeleteAsync(id, ct);
 
-            if (!updated)
-            {
-                return Problem(
-                    statusCode: StatusCodes.Status404NotFound,
-                    title: "Ressource introuvable",
-                    detail: $"Impossible de mettre à jour. L'hôtel avec l'ID {id} n'existe pas."
-                );
-            }
-
-            return NoContent();
-        }
-        [HttpDelete("{id:int}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken ct)
-        {
-            var deleted = await _hotelService.DeleteAsync(id, ct);
-
-            if (!deleted)
-            {
-                return NotFound(new { Message = $"Impossible de supprimer. L'hôtel avec l'ID {id} n'existe pas." });
-            }
-
-            return NoContent();
-        }
-
+        return NoContent();
     }
 }
