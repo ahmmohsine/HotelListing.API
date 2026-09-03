@@ -1,6 +1,7 @@
 using HotelListing.API.Data;
 using HotelListing.API.Repositories;
 using HotelListing.API.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotelListing.API.Extensions
 {
@@ -16,6 +17,8 @@ namespace HotelListing.API.Extensions
         /// </summary>
         public static IServiceCollection AddApiServices(this IServiceCollection services)
         {
+            var connectionString = services.BuildServiceProvider().GetRequiredService<IConfiguration>().GetConnectionString("HotelListingDbConnectionString");
+            services.AddDbContext<HotelListingDbContext>(options => options.UseSqlServer(connectionString));
             // Controllers and API behavior
             services.AddControllers();
 
@@ -24,7 +27,7 @@ namespace HotelListing.API.Extensions
 
             // Repository implementations
             services.AddScoped<IGenericRepository<Country>, CountryRepository>();
-            services.AddScoped<IGenericRepository<Hotel>, HotelsRepository>();
+            services.AddScoped<IGenericRepository<Hotel>, HotelRepository>();
 
             services.AddScoped<IHotelService, HotelService>();
             services.AddScoped<ICountryService, CountryService>();

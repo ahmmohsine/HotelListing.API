@@ -37,18 +37,18 @@ namespace HotelListing.API.Repositories
             }
         }
 
-        public Task DeleteAsync(int id, CancellationToken ct = default)
+        public Task<bool> DeleteAsync(int id, CancellationToken ct = default)
         {
             lock (_lock)
             {
                 var _country = _countries.FirstOrDefault(c => c.Id == id);
                 if (_country == null)
                 {
-                    throw new KeyNotFoundException($"Country with Id {id} not found");
+                    return Task.FromResult(false);
                 }
 
                 _countries.Remove(_country);
-                return Task.CompletedTask;
+                return Task.FromResult(true);
             }
         }
 
@@ -79,5 +79,6 @@ namespace HotelListing.API.Repositories
                 return Task.FromResult(result);
             }
         }
+
     }
 }

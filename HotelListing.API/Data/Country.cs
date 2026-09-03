@@ -1,10 +1,15 @@
-namespace HotelListing.API.Data
+﻿using System;
+using System.Collections.Generic;
+
+namespace HotelListing.API.Data;
+
+public partial class Country
 {
-    public class Country
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Code { get; set; }
-        public IList<Hotel> Hotels { get; set; }
-    }
+    public int Id { get; set; }
+
+    public string Name { get; set; } = null!;
+
+    public string Code { get; set; } = null!;
+
+    public virtual ICollection<Hotel> Hotels { get; set; } = new List<Hotel>();
 }
