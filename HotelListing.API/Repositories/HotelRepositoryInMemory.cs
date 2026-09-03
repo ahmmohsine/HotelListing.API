@@ -5,7 +5,7 @@ namespace HotelListing.API.Repositories;
 
 public class HotelRepositoryInMemory : IGenericRepository<Hotel>
 {
-    private static readonly List<Hotel> _hotels = Seed.GenerateHotels_();
+    private static readonly List<Hotel> _hotels;
 
     public Task<IEnumerable<Hotel>> GetAllAsync(CancellationToken ct = default)
     {

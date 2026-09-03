@@ -40,14 +40,14 @@ public class HotelRepository : IGenericRepository<Hotel>
     public async Task<Hotel?> FindAsync(Expression<Func<Hotel, bool>> predicate, CancellationToken ct = default)
     {
         return await _context.Hotels
-            .AsNoTracking() // Performance : pas de Change Tracking pour la lecture
+            .AsNoTracking()
             .FirstOrDefaultAsync(predicate, ct);
     }
 
     public async Task<IEnumerable<Hotel>> GetAllAsync(CancellationToken ct = default)
     {
         return await _context.Hotels
-            .AsNoTracking() // Performance
+            .AsNoTracking()
             .ToListAsync(ct);
     }
 

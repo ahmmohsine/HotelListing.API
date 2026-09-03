@@ -1,84 +1,63 @@
-using HotelListing.API.Data;
+﻿using HotelListing.API.Data;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace HotelListing.API.Repositories
 {
     public class CountryRepository : IGenericRepository<Country>
     {
-        private static readonly List<Country> _countries = Seed.GenerateCountries();
-        private static readonly object _lock = new();
-
-        public Task<IEnumerable<Country>> GetAllAsync(CancellationToken ct = default)
+        HotelListingDbContext _context;
+        public CountryRepository(HotelListingDbContext context)
         {
-            lock (_lock)
-            {
-                return Task.FromResult<IEnumerable<Country>>(_countries.ToList());
-            }
+            _context = context;
+        }
+        public async Task<Country> AddAsync(Country country, CancellationToken ct = default)
+        {
+            _context.Countries.Add(country);
+            await _context.SaveChangesAsync(ct);
+            return country;
         }
 
-        public Task<Country?> GetByIdAsync(int id, CancellationToken ct = default)
+        public async Task<bool> DeleteAsync(int id, CancellationToken ct = default)
         {
-            lock (_lock)
-            { return Task.FromResult(_countries.FirstOrDefault(c => c.Id == id)); }
+            var country = await _context.Countries.FindAsync(new object[] { id }, ct);
+            if (country == null)
+                return false;
+
+            _context.Countries.Remove(country);
+            await _context.SaveChangesAsync(ct);
+            return true;
         }
 
-        public Task UpdateAsync(Country country, CancellationToken ct = default)
+        public async Task<bool> ExistsAsync(int id, CancellationToken ct = default)
         {
-            lock (_lock)
-            {
-                var _country = _countries.FirstOrDefault(c => c.Id == country.Id);
-                if (_country == null)
-                {
-                    throw new KeyNotFoundException($"Le pays avec l'ID {country.Id} n'existe pas.");
-                }
-                _country.Name = country.Name;
-                _country.Code = country.Code;
-                return Task.CompletedTask;
-            }
+            var country = await _context.Countries.FindAsync(new object[] { id }, ct);
+            return country != null;
         }
 
-        public Task<bool> DeleteAsync(int id, CancellationToken ct = default)
+        public async Task<Country?> FindAsync(Expression<Func<Country, bool>> predicate, CancellationToken ct = default)
         {
-            lock (_lock)
-            {
-                var _country = _countries.FirstOrDefault(c => c.Id == id);
-                if (_country == null)
-                {
-                    return Task.FromResult(false);
-                }
-
-                _countries.Remove(_country);
-                return Task.FromResult(true);
-            }
+            return await _context.Countries
+               .AsNoTracking()
+            .FirstOrDefaultAsync(predicate, ct);
         }
 
-        public Task<bool> ExistsAsync(int id, CancellationToken ct = default)
+        public async Task<IEnumerable<Country>> GetAllAsync(CancellationToken ct = default)
         {
-            lock (_lock)
-            { return Task.FromResult(_countries.Any(h => h.Id == id)); }
-
+            return await _context.Countries
+                .AsNoTracking()
+                .ToListAsync(ct);
         }
 
-
-
-        public Task<Country> AddAsync(Country country, CancellationToken ct = default)
+        public async Task<Country?> GetByIdAsync(int id, CancellationToken ct = default)
         {
-            lock (_lock)
-            {
-                int newId = _countries.Any() ? _countries.Max(c => c.Id) + 1 : 1;
-                country.Id = newId;
-                _countries.Add(country);
-                return Task.FromResult(country);
-            }
-        }
-        public Task<Country?> FindAsync(Expression<Func<Country, bool>> predicate, CancellationToken ct = default)
-        {
-            lock (_lock)
-            {
-                var result = _countries.AsQueryable().FirstOrDefault(predicate);
-                return Task.FromResult(result);
-            }
+            return await _context.Countries.FindAsync(new object[] { id }, ct);
         }
 
+        public async Task UpdateAsync(Country entity, CancellationToken ct = default)
+        {
+            _context.Countries.Update(entity);
+            await _context.SaveChangesAsync(ct);
+        }
     }
 }
