@@ -13,22 +13,25 @@ namespace HotelListing.API.Extensions
     {
         /// <summary>
         /// Adds core API services to the dependency injection container.
-        /// Registers controllers, OpenAPI documentation, and repository implementations.
         /// </summary>
-        public static IServiceCollection AddApiServices(this IServiceCollection services)
+        public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration)
         {
-            var connectionString = services.BuildServiceProvider().GetRequiredService<IConfiguration>().GetConnectionString("HotelListingDbConnectionString");
-            services.AddDbContext<HotelListingDbContext>(options => options.UseSqlServer(connectionString));
+            var connectionString = configuration.GetConnectionString("HotelListingDbConn");
+
+            services.AddDbContext<HotelListingDbContext>(options =>
+                options.UseSqlServer(connectionString));
+
             // Controllers and API behavior
             services.AddControllers();
 
             // OpenAPI / Swagger documentation
             services.AddOpenApi();
 
-            // Repository implementations
+            // Repositories
             services.AddScoped<IGenericRepository<Country>, CountryRepository>();
             services.AddScoped<IGenericRepository<Hotel>, HotelRepository>();
 
+            // Domain Services
             services.AddScoped<IHotelService, HotelService>();
             services.AddScoped<ICountryService, CountryService>();
 

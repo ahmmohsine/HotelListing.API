@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Builder;
-
 namespace HotelListing.API.Extensions
 {
     /// <summary>
@@ -14,6 +12,7 @@ namespace HotelListing.API.Extensions
         /// </summary>
         public static WebApplication UseApiConfiguration(this WebApplication app)
         {
+
             // Configure development-specific middleware
             if (app.Environment.IsDevelopment())
             {

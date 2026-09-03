@@ -4,33 +4,19 @@ namespace HotelListing.API.Data;
 
 public partial class HotelListingDbContext : DbContext
 {
-    public HotelListingDbContext()
+    public HotelListingDbContext(DbContextOptions<HotelListingDbContext> options)
+         : base(options)
     {
     }
 
-    public HotelListingDbContext(DbContextOptions<HotelListingDbContext> options)
-        : base(options)
-    {
-    }
 
     public virtual DbSet<Country> Countries { get; set; }
 
     public virtual DbSet<Hotel> Hotels { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Name=ConnectionStrings:HotelListingDbConnectionString");
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Hotel>(entity =>
-        {
-            entity.HasIndex(e => e.CountryId, "IX_Hotels_CountryId");
-
-            entity.HasOne(d => d.Country).WithMany(p => p.Hotels).HasForeignKey(d => d.CountryId);
-        });
-
-        OnModelCreatingPartial(modelBuilder);
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(HotelListingDbContext).Assembly);
     }
-
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
