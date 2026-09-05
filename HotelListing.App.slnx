@@ -3,7 +3,6 @@
     <File Path=".git/agents/api-security-reviewer.agent.md" />
     <File Path=".git/instructions/agents.md" />
     <File Path=".git/skills/api-auth-hardening/SKILL.md" />
-    <File Path=".git/workflows/HotelListingApi.yml" />
     <File Path="README.md" />
   </Folder>
   <Project Path="HotelListing.API/HotelListing.API.csproj" />
