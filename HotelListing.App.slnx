@@ -3,7 +3,7 @@
     <File Path=".git/agents/api-security-reviewer.agent.md" />
     <File Path=".git/instructions/agents.md" />
     <File Path=".git/skills/api-auth-hardening/SKILL.md" />
-    <File Path=".git/workflows/HotelListing.yml" />
+    <File Path=".git/workflows/HotelListingApp.yml" />
     <File Path=".gitignore" />
     <File Path="README.md" />
   </Folder>
