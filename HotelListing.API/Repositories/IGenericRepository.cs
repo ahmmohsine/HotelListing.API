@@ -4,6 +4,7 @@ namespace HotelListing.API.Repositories
 {
     public interface IGenericRepository<T> where T : class
     {
+        IQueryable<T> GetQueryable();
         Task<IEnumerable<T>> GetAllAsync(CancellationToken ct = default);
         Task<T?> GetByIdAsync(int id, CancellationToken ct = default);
         Task UpdateAsync(T entity, CancellationToken ct = default);

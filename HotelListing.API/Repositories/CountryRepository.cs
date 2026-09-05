@@ -54,6 +54,11 @@ namespace HotelListing.API.Repositories
             return await _context.Countries.FindAsync(new object[] { id }, ct);
         }
 
+        public IQueryable<Country> GetQueryable()
+        {
+            return _context.Countries.AsNoTracking().AsQueryable();
+        }
+
         public async Task UpdateAsync(Country entity, CancellationToken ct = default)
         {
             _context.Countries.Update(entity);

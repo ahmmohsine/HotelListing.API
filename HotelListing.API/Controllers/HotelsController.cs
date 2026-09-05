@@ -1,5 +1,6 @@
 ﻿using HotelListing.API.DTOs.Country;
 using HotelListing.API.DTOs.Hotel;
+using HotelListing.API.Results;
 using HotelListing.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,8 +21,12 @@ public class HotelsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<HotelReadOnlyDto>))]
     public async Task<IActionResult> GetAll(CancellationToken ct)
     {
-        var hotels = await _hotelService.GetAllAsync(ct);
-        return Ok(hotels);
+        var result = await _hotelService.GetAllAsync(ct);
+        if (result.IsFailure)
+        {
+            return result.ToActionResult();
+        }
+        return CreatedAtAction(nameof(GetById), new { id = result.Value.FirstOrDefault()?.Id }, result.Value);
     }
 
     [HttpGet("{id:int}")]
@@ -29,14 +34,8 @@ public class HotelsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById([FromRoute] int id, CancellationToken ct)
     {
-        var hotel = await _hotelService.GetByIdAsync(id, ct);
-
-        if (hotel is null)
-        {
-            return NotFound(new { Message = $"L'hôtel avec l'ID {id} n'a pas été trouvé." });
-        }
-
-        return Ok(hotel);
+        var result = await _hotelService.GetByIdAsync(id, ct);
+        return result.ToActionResult();
     }
 
     [HttpPost]
@@ -44,13 +43,9 @@ public class HotelsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] CreateHotelDto dto, CancellationToken ct)
     {
-        var createdHotel = await _hotelService.CreateAsync(dto, ct);
+        var result = await _hotelService.CreateAsync(dto, ct);
 
-        return CreatedAtAction(
-            nameof(GetById),
-            new { id = createdHotel.Id },
-            createdHotel
-        );
+        return result.ToActionResult();
     }
 
     [HttpPut("{id:int}")]
@@ -59,9 +54,8 @@ public class HotelsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateHotelDto dto, CancellationToken ct)
     {
-        await _hotelService.UpdateAsync(id, dto, ct);
-
-        return NoContent();
+        var result = await _hotelService.UpdateAsync(id, dto, ct);
+        return result.ToActionResult();
     }
 
     [HttpDelete("{id:int}")]
@@ -69,8 +63,7 @@ public class HotelsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken ct)
     {
-        await _hotelService.DeleteAsync(id, ct);
-
-        return NoContent();
+        var result = await _hotelService.DeleteAsync(id, ct);
+        return result.ToActionResult();
     }
 }

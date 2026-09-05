@@ -1,6 +1,8 @@
 using HotelListing.API.Data;
 using HotelListing.API.Repositories;
 using HotelListing.API.Services;
+using Mapster;
+using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelListing.API.Extensions
@@ -35,6 +37,11 @@ namespace HotelListing.API.Extensions
             services.AddScoped<IHotelService, HotelService>();
             services.AddScoped<ICountryService, CountryService>();
 
+            // 1. Charger la configuration globale de Mapster
+            var config = TypeAdapterConfig.GlobalSettings;
+            config.Scan(typeof(Program).Assembly);
+            services.AddSingleton(config);
+            services.AddScoped<IMapper, ServiceMapper>();
             return services;
         }
     }

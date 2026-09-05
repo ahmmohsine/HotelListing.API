@@ -1,5 +1,4 @@
-﻿using HotelListing.API.DTOs.Country;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace HotelListing.API.DTOs.Hotel
 {
@@ -7,6 +6,6 @@ namespace HotelListing.API.DTOs.Hotel
     {
         [Required]
         public int Id { get; set; }
-        public CountryReadOnlyDto? Country { get; set; }
+        public string? Country { get; set; }
     }
 }

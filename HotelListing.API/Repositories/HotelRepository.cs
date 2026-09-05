@@ -56,6 +56,11 @@ public class HotelRepository : IGenericRepository<Hotel>
         return await _context.Hotels.FindAsync(new object[] { id }, ct);
     }
 
+    public IQueryable<Hotel> GetQueryable()
+    {
+        return _context.Hotels.AsNoTracking();
+    }
+
     public async Task UpdateAsync(Hotel entity, CancellationToken ct = default)
     {
         _context.Hotels.Update(entity);

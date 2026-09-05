@@ -1,14 +1,14 @@
 ﻿using HotelListing.API.DTOs.Country;
+using HotelListing.API.Results;
 
-namespace HotelListing.API.Services
+namespace HotelListing.API.Services;
+
+public interface ICountryService
 {
-    public interface ICountryService
-    {
-        Task<IEnumerable<CountryReadOnlyDto>> GetAllAsync(CancellationToken ct = default);
-        Task<CountryReadOnlyDto?> GetByCodeAsync(string code, CancellationToken ct = default);
-        Task<CountryReadOnlyDto?> GetByIdAsync(int id, CancellationToken ct = default);
-        Task<bool> UpdateAsync(int id, UpdateCountryDto dto, CancellationToken ct = default);
-        Task<CountryReadOnlyDto> CreateCountryAsync(CreateCountryDto dto, CancellationToken ct = default);
-        Task<bool> DeleteCountryAsync(int id, CancellationToken ct = default);
-    }
+    Task<Result<IEnumerable<CountryReadOnlyDto>>> GetAllAsync(CancellationToken ct = default);
+    Task<Result<CountryReadOnlyDto>> GetByIdAsync(int id, CancellationToken ct = default);
+    Task<Result<CountryReadOnlyDto>> GetByCodeAsync(string code, CancellationToken ct = default);
+    Task<Result<CountryReadOnlyDto>> CreateCountryAsync(CreateCountryDto dto, CancellationToken ct = default);
+    Task<Result> UpdateAsync(int id, UpdateCountryDto dto, CancellationToken ct = default);
+    Task<Result> DeleteCountryAsync(int id, CancellationToken ct = default);
 }

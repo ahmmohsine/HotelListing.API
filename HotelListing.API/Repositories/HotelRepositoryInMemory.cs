@@ -1,6 +1,6 @@
 ﻿using HotelListing.API.Data;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-
 namespace HotelListing.API.Repositories;
 
 public class HotelRepositoryInMemory : IGenericRepository<Hotel>
@@ -66,5 +66,10 @@ public class HotelRepositoryInMemory : IGenericRepository<Hotel>
         // Compile l'expression LINQ pour l'exécuter sur la liste en mémoire
         var hotel = _hotels.AsQueryable().FirstOrDefault(predicate);
         return Task.FromResult(hotel);
+    }
+
+    public IQueryable<Hotel> GetQueryable()
+    {
+        return _hotels.AsQueryable().AsNoTracking();
     }
 }

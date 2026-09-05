@@ -1,4 +1,5 @@
 using HotelListing.API.Data;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace HotelListing.API.Repositories
@@ -84,5 +85,9 @@ namespace HotelListing.API.Repositories
             }
         }
 
+        public IQueryable<Country> GetQueryable()
+        {
+            return _countries.AsQueryable().AsNoTracking();
+        }
     }
 }

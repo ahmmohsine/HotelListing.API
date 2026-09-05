@@ -1,16 +1,17 @@
 ﻿using HotelListing.API.DTOs.Country;
 using HotelListing.API.DTOs.Hotel;
+using HotelListing.API.Results;
 
 namespace HotelListing.API.Services
 {
     public interface IHotelService
     {
-        Task<IEnumerable<HotelReadOnlyDto>> GetAllAsync(CancellationToken ct = default);
-        Task<HotelReadOnlyDto?> GetByIdAsync(int id, CancellationToken ct = default);
-        Task UpdateAsync(int id, UpdateHotelDto dto, CancellationToken ct = default);
-        Task DeleteAsync(int id, CancellationToken ct = default);
-        Task<HotelReadOnlyDto> CreateAsync(CreateHotelDto dto, CancellationToken ct = default);
-        Task<bool> ExistsAsync(int id, CancellationToken ct = default);
+        Task<Result<IEnumerable<HotelReadOnlyDto>>> GetAllAsync(CancellationToken ct = default);
+        Task<Result<HotelReadOnlyDto>> CreateAsync(CreateHotelDto hotelDto, CancellationToken ct = default);
+        Task<Result<HotelReadOnlyDto?>> GetByIdAsync(int id, CancellationToken ct = default);
+        Task<Result> UpdateAsync(int id, UpdateHotelDto dto, CancellationToken ct = default);
+        Task<Result> DeleteAsync(int id, CancellationToken ct = default);
+        Task<Result<bool>> ExistsAsync(int id, CancellationToken ct = default);
 
     }
 }
