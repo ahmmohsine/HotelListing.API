@@ -1,5 +1,5 @@
 ﻿using HotelListing.API.Data;
-using HotelListing.API.DTOs;
+using HotelListing.API.DTOs.Country;
 using HotelListing.API.Repositories;
 
 namespace HotelListing.API.Services;

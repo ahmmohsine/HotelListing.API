@@ -1,4 +1,5 @@
-﻿using HotelListing.API.DTOs;
+﻿using HotelListing.API.DTOs.Country;
+using HotelListing.API.DTOs.Hotel;
 using HotelListing.API.Services;
 using Microsoft.AspNetCore.Mvc;
 

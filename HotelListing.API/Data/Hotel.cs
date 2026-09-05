@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace HotelListing.API.Data;
+﻿namespace HotelListing.API.Data;
 
 public partial class Hotel
 {
@@ -11,7 +8,7 @@ public partial class Hotel
 
     public string? Address { get; set; }
 
-    public double Rating { get; set; }
+    public double? Rating { get; set; }
 
     public int CountryId { get; set; }
 

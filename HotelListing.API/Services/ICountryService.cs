@@ -1,4 +1,4 @@
-﻿using HotelListing.API.DTOs;
+﻿using HotelListing.API.DTOs.Country;
 
 namespace HotelListing.API.Services
 {
