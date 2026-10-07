@@ -1,5 +1,4 @@
 @HotelListing.API_HostAddress = https://localhost:7166
-
 GET {{HotelListing.API_HostAddress}}/api/hotels
 Accept: application/json
 
@@ -9,10 +8,10 @@ PUT {{HotelListing.API_HostAddress}}/api/hotels/3
 Content-Type: application/json
 
 {
-  "name": "Grand Hotel Brussels Updated",
-  "address": "Rue Royale 100, 1000 Bruxelles",
-  "rating": 4,
-  "countryId": 1
+	"name": "Grand Hotel Brussels Updated",
+	"address": "Rue Royale 100, 1000 Bruxelles",
+	"rating": 4,
+	"countryId": 1
 }
 ###
 @id=0
@@ -33,7 +32,9 @@ Content-Type: application/json
 	"countryId": 1
 }
 ###
+
 GET {{HotelListing.API_HostAddress}}/api/countries
+X-Api-Key: {{ApiKey}}
 
 ###
 GET {{HotelListing.API_HostAddress}}/api/countries/1
@@ -46,8 +47,8 @@ POST {{HotelListing.API_HostAddress}}/api/countries
 Content-Type: application/json
 
 {
-  "name": "Belgique",
-  "code": "BE"
+	"name": "Belgique",
+	"code": "BE"
 }
 
 ###
@@ -55,8 +56,8 @@ PUT {{HotelListing.API_HostAddress}}/api/countries/1
 Content-Type: application/json
 
 {
-  "name": "United States of America",
-  "code": "US"
+	"name": "United States of America",
+	"code": "US"
 }
 
 ###

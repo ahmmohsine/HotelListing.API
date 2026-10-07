@@ -76,4 +76,7 @@ public readonly record struct Result<T>
 
     public Result<T> Ensure(Func<T, bool> predicate, Error error)
         => IsSuccess && !predicate(Value) ? Failure(error) : this;
+
+    public static Result<T> BadRequest() => new(false, default, []);
+    public static Result<T> BadRequest(Error[] errors) => new(false, default, errors);
 }

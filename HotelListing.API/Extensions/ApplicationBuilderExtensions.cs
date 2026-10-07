@@ -1,3 +1,6 @@
+using HotelListing.API.Data;
+using Scalar.AspNetCore;
+
 namespace HotelListing.API.Extensions
 {
     /// <summary>
@@ -12,11 +15,13 @@ namespace HotelListing.API.Extensions
         /// </summary>
         public static WebApplication UseApiConfiguration(this WebApplication app)
         {
+            app.MapGroup("app/defaultauth").MapIdentityApi<ApplicationUser>();
 
             // Configure development-specific middleware
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
+                app.MapScalarApiReference();
             }
 
             // Enforce HTTPS

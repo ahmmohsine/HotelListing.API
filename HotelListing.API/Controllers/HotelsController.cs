@@ -1,7 +1,7 @@
-﻿using HotelListing.API.DTOs.Country;
+﻿using HotelListing.API.Contracts;
+using HotelListing.API.DTOs.Country;
 using HotelListing.API.DTOs.Hotel;
 using HotelListing.API.Results;
-using HotelListing.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelListing.API.Controllers;

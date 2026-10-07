@@ -1,4 +1,5 @@
-﻿using HotelListing.API.Data;
+﻿using HotelListing.API.Contracts;
+using HotelListing.API.Data;
 using HotelListing.API.DTOs.Country;
 using HotelListing.API.DTOs.Hotel;
 using HotelListing.API.Repositories;

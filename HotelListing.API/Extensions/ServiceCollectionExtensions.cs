@@ -1,8 +1,13 @@
+using HotelListing.API.Constants;
+using HotelListing.API.Contracts;
 using HotelListing.API.Data;
+using HotelListing.API.Handlers;
 using HotelListing.API.Repositories;
 using HotelListing.API.Services;
 using Mapster;
 using MapsterMapper;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelListing.API.Extensions
@@ -23,6 +28,20 @@ namespace HotelListing.API.Extensions
             services.AddDbContext<HotelListingDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
+            services.AddIdentityApiEndpoints<ApplicationUser>()
+                  .AddRoles<IdentityRole>().
+                AddEntityFrameworkStores<HotelListingDbContext>();
+            ;
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = AuthenticationDefaults.ApiKeyScheme;
+                options.DefaultChallengeScheme = AuthenticationDefaults.ApiKeyScheme;
+            }
+            ).AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(AuthenticationDefaults.BasicScheme, _ => { }).
+            AddScheme<AuthenticationSchemeOptions, ApiAuthenticationHandler>(AuthenticationDefaults.ApiKeyScheme, _ => { });
+            // (options => options.Password.RequiredLength = 5);
+            services.AddAuthorization();
             // Controllers and API behavior
             services.AddControllers();
 
@@ -32,6 +51,8 @@ namespace HotelListing.API.Extensions
             // Repositories
             services.AddScoped<IGenericRepository<Country>, CountryRepository>();
             services.AddScoped<IGenericRepository<Hotel>, HotelRepository>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IApiKeyValidatorService, ApiKeyValidatorService>();
 
             // Domain Services
             services.AddScoped<IHotelService, HotelService>();

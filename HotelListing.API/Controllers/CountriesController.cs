@@ -1,6 +1,7 @@
+using HotelListing.API.Contracts;
 using HotelListing.API.DTOs.Country;
 using HotelListing.API.Results;
-using HotelListing.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelListing.API.Controllers;
@@ -17,6 +18,7 @@ public class CountriesController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CountryReadOnlyDto>))]
     public async Task<IActionResult> GetAll(CancellationToken ct)
     {

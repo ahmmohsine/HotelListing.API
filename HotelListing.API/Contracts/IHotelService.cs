@@ -2,7 +2,7 @@
 using HotelListing.API.DTOs.Hotel;
 using HotelListing.API.Results;
 
-namespace HotelListing.API.Services
+namespace HotelListing.API.Contracts
 {
     public interface IHotelService
     {
