@@ -8,6 +8,7 @@ namespace HotelListing.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class CountriesController : ControllerBase
 {
     private readonly ICountryService _countryService;
@@ -18,7 +19,7 @@ public class CountriesController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CountryReadOnlyDto>))]
     public async Task<IActionResult> GetAll(CancellationToken ct)
     {
@@ -29,6 +30,7 @@ public class CountriesController : ControllerBase
     [HttpGet("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CountryReadOnlyDto))]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [AllowAnonymous]
     public async Task<IActionResult> GetById([FromRoute] int id, CancellationToken ct)
     {
         var result = await _countryService.GetByIdAsync(id, ct);
@@ -40,6 +42,7 @@ public class CountriesController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [HttpPost]
+    [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> CreateCountry([FromBody] CreateCountryDto dto, CancellationToken ct)
     {
         var result = await _countryService.CreateCountryAsync(dto, ct);
@@ -54,6 +57,7 @@ public class CountriesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> UpdateCountry([FromRoute] int id, [FromBody] UpdateCountryDto dto, CancellationToken ct)
     {
         var result = await _countryService.UpdateAsync(id, dto, ct);
@@ -63,6 +67,7 @@ public class CountriesController : ControllerBase
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> DeleteCountry([FromRoute] int id, CancellationToken ct)
     {
         var result = await _countryService.DeleteCountryAsync(id, ct);

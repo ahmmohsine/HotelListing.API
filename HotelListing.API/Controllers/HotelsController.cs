@@ -2,8 +2,8 @@
 using HotelListing.API.DTOs.Country;
 using HotelListing.API.DTOs.Hotel;
 using HotelListing.API.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 namespace HotelListing.API.Controllers;
 
 [Route("api/[controller]")]
@@ -18,20 +18,18 @@ public class HotelsController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<HotelReadOnlyDto>))]
     public async Task<IActionResult> GetAll(CancellationToken ct)
     {
         var result = await _hotelService.GetAllAsync(ct);
-        if (result.IsFailure)
-        {
-            return result.ToActionResult();
-        }
-        return CreatedAtAction(nameof(GetById), new { id = result.Value.FirstOrDefault()?.Id }, result.Value);
+        return result.ToActionResult();
     }
 
     [HttpGet("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(HotelReadOnlyDto))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [AllowAnonymous]
     public async Task<IActionResult> GetById([FromRoute] int id, CancellationToken ct)
     {
         var result = await _hotelService.GetByIdAsync(id, ct);
@@ -40,18 +38,22 @@ public class HotelsController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(HotelReadOnlyDto))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> Create([FromBody] CreateHotelDto dto, CancellationToken ct)
     {
         var result = await _hotelService.CreateAsync(dto, ct);
 
-        return result.ToActionResult();
-    }
+        if (!result.IsSuccess)
+            return result.ToActionResult();
 
+        return CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value);
+    }
     [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateHotelDto dto, CancellationToken ct)
     {
         var result = await _hotelService.UpdateAsync(id, dto, ct);
@@ -61,6 +63,7 @@ public class HotelsController : ControllerBase
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken ct)
     {
         var result = await _hotelService.DeleteAsync(id, ct);

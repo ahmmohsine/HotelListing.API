@@ -7,6 +7,7 @@ using HotelListing.API.Services;
 using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,12 +34,35 @@ namespace HotelListing.API.Extensions
                 AddEntityFrameworkStores<HotelListingDbContext>();
             ;
 
+            //services.AddAuthentication(options =>
+            //{
+            //    options.DefaultAuthenticateScheme = AuthenticationDefaults.ApiKeyScheme;
+            //    options.DefaultChallengeScheme = AuthenticationDefaults.ApiKeyScheme;
+            //}
+            //).AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(AuthenticationDefaults.BasicScheme, _ => { }).
+            //AddScheme<AuthenticationSchemeOptions, ApiAuthenticationHandler>(AuthenticationDefaults.ApiKeyScheme, _ => { });
             services.AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme = AuthenticationDefaults.ApiKeyScheme;
-                options.DefaultChallengeScheme = AuthenticationDefaults.ApiKeyScheme;
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }
-            ).AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(AuthenticationDefaults.BasicScheme, _ => { }).
+            ).
+            AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = configuration["Jwt:Issuer"],
+                    ValidAudience = configuration["Jwt:Audience"],
+                    IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey
+                    (System.Text.Encoding.UTF8.GetBytes(configuration["Jwt:Key"])),
+                    ClockSkew = TimeSpan.Zero // Optional: Set clock skew to zero for immediate expiration default is 5min
+                };
+            }).
+            AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(AuthenticationDefaults.BasicScheme, _ => { }).
             AddScheme<AuthenticationSchemeOptions, ApiAuthenticationHandler>(AuthenticationDefaults.ApiKeyScheme, _ => { });
             // (options => options.Password.RequiredLength = 5);
             services.AddAuthorization();
@@ -51,6 +75,7 @@ namespace HotelListing.API.Extensions
             // Repositories
             services.AddScoped<IGenericRepository<Country>, CountryRepository>();
             services.AddScoped<IGenericRepository<Hotel>, HotelRepository>();
+            services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IApiKeyValidatorService, ApiKeyValidatorService>();
 

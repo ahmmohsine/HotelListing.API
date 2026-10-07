@@ -3,13 +3,18 @@
 namespace HotelListing.API.Services
 {
     //If use DB to store API keys, must inject DB context
-    public class ApiKeyValidatorService(IConfiguration configuration) : IApiKeyValidatorService
+    public class ApiKeyValidatorService : IApiKeyValidatorService
     {
-        public Task<bool> ValidateApiKeyAsync(string apiKey, CancellationToken token = default)
+        private readonly IApiKeyRepository _apiKeyRepository;
+
+        public ApiKeyValidatorService(IApiKeyRepository apiKeyRepository)
         {
-            //Query to table to check if the API key exists and is valid and if experation date is not passed
-            //return true or false based on the result of the query
-            return Task.FromResult(apiKey.Equals(configuration["ApiKey"]));
+            _apiKeyRepository = apiKeyRepository;
+        }
+
+        public async Task<bool> ValidateApiKeyAsync(string apiKey, CancellationToken token = default)
+        {
+            return await _apiKeyRepository.ValidateApiKeyAsync(apiKey, token);
         }
     }
 }

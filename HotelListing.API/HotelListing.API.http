@@ -34,7 +34,7 @@ Content-Type: application/json
 ###
 
 GET {{HotelListing.API_HostAddress}}/api/countries
-X-Api-Key: {{ApiKey}}
+Authorization: bearer {{JwtToken}}
 
 ###
 GET {{HotelListing.API_HostAddress}}/api/countries/1
@@ -62,3 +62,13 @@ Content-Type: application/json
 
 ###
 DELETE {{HotelListing.API_HostAddress}}/api/countries/5
+###
+POST {{HotelListing.API_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+	"email": "admin@test.com",
+	"password": "Password123!"
+}
+
+###

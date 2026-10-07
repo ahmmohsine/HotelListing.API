@@ -1,7 +1,6 @@
 ﻿using HotelListing.API.Contracts;
 using HotelListing.API.Data;
 using HotelListing.API.DTOs.Country;
-using HotelListing.API.Repositories;
 using HotelListing.API.Results;
 using Mapster;
 using MapsterMapper;

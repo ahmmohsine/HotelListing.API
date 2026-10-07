@@ -1,3 +1,4 @@
+using HotelListing.API.Contracts;
 using HotelListing.API.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;

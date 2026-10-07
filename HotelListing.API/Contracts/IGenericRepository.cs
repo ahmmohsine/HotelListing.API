@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace HotelListing.API.Repositories
+namespace HotelListing.API.Contracts
 {
     public interface IGenericRepository<T> where T : class
     {
